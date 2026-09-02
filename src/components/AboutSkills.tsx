@@ -242,7 +242,6 @@ export const AboutSkills: React.FC = () => {
                   </div>
                   <div className="mt-3 pt-2 border-t border-indigo-950/60 flex items-center gap-1 text-[10px] text-slate-400 font-mono">
                     <span className="text-[#FF7A29]">0{idx + 1}</span>
-                    <span>/ Verified Habit</span>
                   </div>
                 </div>
               );
