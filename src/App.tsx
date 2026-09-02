@@ -11,7 +11,7 @@ import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { AdminPortal } from './components/admin/AdminPortal';
 import { AdminAuthScreen } from './components/admin/AdminAuthScreen';
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 const MainPortfolioApp: React.FC = () => {
   const { isCMSOpen, setIsCMSOpen, isAdminAuthenticated } = usePortfolio();
@@ -53,6 +53,7 @@ export default function App() {
   return (
     <PortfolioProvider>
       <MainPortfolioApp />
+      <Analytics />
     </PortfolioProvider>
   );
 }
