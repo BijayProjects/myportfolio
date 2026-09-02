@@ -11,6 +11,7 @@ import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { AdminPortal } from './components/admin/AdminPortal';
 import { AdminAuthScreen } from './components/admin/AdminAuthScreen';
+import { Analytics } from "@vercel/analytics/next";
 
 const MainPortfolioApp: React.FC = () => {
   const { isCMSOpen, setIsCMSOpen, isAdminAuthenticated } = usePortfolio();

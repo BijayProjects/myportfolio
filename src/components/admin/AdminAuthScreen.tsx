@@ -78,7 +78,7 @@ export const AdminAuthScreen: React.FC<AdminAuthScreenProps> = ({ onBackToSite }
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
               <span>Admin Username</span>
-              <span className="text-[10px] text-slate-500 font-mono">Default: admin</span>
+              <span className="text-[10px] text-slate-500 font-mono"></span>
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
@@ -104,7 +104,7 @@ export const AdminAuthScreen: React.FC<AdminAuthScreenProps> = ({ onBackToSite }
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
               <span>Master Password</span>
-              <span className="text-[10px] text-slate-500 font-mono">Default: admin123</span>
+              <span className="text-[10px] text-slate-500 font-mono"></span>
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
