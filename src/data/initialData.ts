@@ -1,4 +1,152 @@
-import { PortfolioData } from '../types';
+import {
+  PortfolioData,
+  SectionContentConfig,
+  HeroAnimationConfig,
+  CustomSection
+} from '../types';
+
+export const defaultHeroAnimation: HeroAnimationConfig = {
+  typingWords: [
+    'Scalable Web Systems',
+    'Django & PHP Backends',
+    'Custom CMS & Portals',
+    'AI-Powered Workflows',
+    'High-Performance UI'
+  ],
+  animationType: 'typewriter',
+  typingSpeedMs: 85,
+  pauseDurationMs: 1800,
+  prefixText: "Hi, I'm",
+  buildingPrefix: "Building",
+  headlineGradient: 'orange-amber',
+  roleBadgeText: "Software Engineer",
+  subRoleBadgeText: "Full-Stack Developer"
+};
+
+export const defaultSectionConfigs: Record<string, SectionContentConfig> = {
+  hero: {
+    id: 'hero',
+    badge: 'Available for Freelance & Full-time',
+    badgeIcon: 'Zap',
+    title: "Hi, I'm",
+    titleAccent: 'Software Engineer',
+    subtitle: 'Highly motivated and results-oriented Software Developer delivering production-ready web applications and solving complex business problems.',
+    animationType: 'typewriter',
+    accentGradient: 'orange-amber',
+    enabled: true
+  },
+  about: {
+    id: 'about',
+    badge: 'About & Technical Arsenal',
+    badgeIcon: 'Sparkles',
+    title: 'Engineered for ',
+    titleAccent: 'Scalability',
+    titleSuffix: ' & Reliability',
+    subtitle: 'With 2+ years of hands-on software development experience, I specialize in architecting backend systems, crafting pixel-perfect responsive frontends, and automating workflows.',
+    animationType: 'glow-pulse',
+    accentGradient: 'orange-amber',
+    enabled: true
+  },
+  projects: {
+    id: 'projects',
+    badge: 'Production Portfolio',
+    badgeIcon: 'FolderGit2',
+    title: 'Featured ',
+    titleAccent: 'Software Projects',
+    subtitle: 'End-to-end web applications, custom WordPress architecture, AI automation engines, and high-throughput APIs.',
+    animationType: 'gradient-shimmer',
+    accentGradient: 'orange-amber',
+    enabled: true
+  },
+  work: {
+    id: 'work',
+    badge: 'Career & Work Entries',
+    badgeIcon: 'Briefcase',
+    title: 'Work History & ',
+    titleAccent: 'Deliverables',
+    subtitle: 'Chronological track record of client solutions, full-stack engagements, and software apprenticeships.',
+    animationType: 'fade-rotate',
+    accentGradient: 'orange-amber',
+    enabled: true
+  },
+  gallery: {
+    id: 'gallery',
+    badge: 'High-Resolution Showcase',
+    badgeIcon: 'Camera',
+    title: 'Visual ',
+    titleAccent: 'Design & Architecture',
+    titleSuffix: ' Gallery',
+    subtitle: 'High-resolution captures of responsive web applications, backend schema diagrams, WordPress UI designs, and AI node workflows.',
+    animationType: 'gradient-shimmer',
+    accentGradient: 'orange-amber',
+    enabled: true
+  },
+  blog: {
+    id: 'blog',
+    badge: 'Technical Insights & Engineering Notes',
+    badgeIcon: 'BookOpen',
+    title: 'Latest ',
+    titleAccent: 'Blog Posts',
+    titleSuffix: ' & Articles',
+    subtitle: 'Practical write-ups on Python Django performance, custom WordPress development, and AI prompt engineering workflows.',
+    animationType: 'typewriter',
+    accentGradient: 'orange-amber',
+    enabled: true
+  },
+  contact: {
+    id: 'contact',
+    badge: "Let's Connect",
+    badgeIcon: 'Mail',
+    title: 'Initiate a Project or ',
+    titleAccent: 'Hire Full-Time',
+    subtitle: 'Available for worldwide remote contracts, high-impact full-stack development, and bespoke client solutions.',
+    animationType: 'glow-pulse',
+    accentGradient: 'orange-amber',
+    enabled: true
+  }
+};
+
+export const defaultCustomSections: CustomSection[] = [
+  {
+    id: 'custom-services',
+    slug: 'services',
+    badge: 'Core Solutions & Capabilities',
+    badgeIcon: 'Zap',
+    title: 'Specialized ',
+    titleAccent: 'Engineering Services',
+    titleSuffix: ' & Advisory',
+    subtitle: 'Targeted technical offerings for modern startups, high-velocity agencies, and expanding digital businesses.',
+    content: 'Delivering end-to-end software solutions tailored to speed, conversion, and architectural robustness.',
+    items: [
+      {
+        id: 'item-1',
+        title: 'Full-Stack Web App Engineering',
+        description: 'Robust Django/PHP backend infrastructure paired with modern responsive interfaces and secure REST APIs.',
+        badge: 'End-to-End',
+        icon: 'Server'
+      },
+      {
+        id: 'item-2',
+        title: 'Custom WordPress & WooCommerce',
+        description: 'Bespoke custom themes, Gutenberg block development, database tuning, and 95+ PageSpeed optimization.',
+        badge: 'CMS Mastery',
+        icon: 'Layout'
+      },
+      {
+        id: 'item-3',
+        title: 'AI Automation & Prompt Engineering',
+        description: 'Integrating LLM workflows, automated data extractors, intelligent search, and autonomous business tooling.',
+        badge: 'Next-Gen AI',
+        icon: 'Cpu'
+      }
+    ],
+    animationType: 'gradient-shimmer',
+    accentGradient: 'orange-amber',
+    placement: 'after-projects',
+    enabled: true,
+    createdAt: '2026-09-01T00:00:00Z'
+  }
+];
 
 export const initialPortfolioData: PortfolioData = {
   profile: {
@@ -468,6 +616,9 @@ AI multiplies developer leverage when used as a deterministic coprocessor in bus
     enableHireMeCta: true,
     customStatusBanner: ""
   },
+  sectionConfigs: defaultSectionConfigs,
+  heroAnimation: defaultHeroAnimation,
+  customSections: defaultCustomSections,
   leads: [
     {
       id: "lead-1",

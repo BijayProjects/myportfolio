@@ -14,6 +14,7 @@ export interface Profile {
   yearsExperience: string;
   bio: string;
   professionalSummary: string;
+  avatarImage?: string;
   education: {
     degree: string;
     field: string;
@@ -247,6 +248,83 @@ export interface SiteSettings {
   customStatusBanner?: string;
 }
 
+export type HeadingAnimationType =
+  | 'typewriter'
+  | 'fade-rotate'
+  | 'gradient-shimmer'
+  | 'wave-bounce'
+  | 'glitch-tech'
+  | 'glow-pulse';
+
+export type AccentGradientTheme =
+  | 'orange-amber'
+  | 'indigo-blue'
+  | 'emerald-teal'
+  | 'rose-pink'
+  | 'purple-violet';
+
+export interface SectionContentConfig {
+  id: string; // 'hero' | 'about' | 'projects' | 'work' | 'blog' | 'gallery' | 'contact'
+  badge: string;
+  badgeIcon?: string;
+  title: string;
+  titleAccent: string;
+  titleSuffix?: string;
+  subtitle: string;
+  animationType: HeadingAnimationType;
+  animationSpeed?: 'slow' | 'normal' | 'fast';
+  accentGradient?: AccentGradientTheme;
+  enabled?: boolean;
+}
+
+export interface HeroAnimationConfig {
+  typingWords: string[];
+  animationType: HeadingAnimationType;
+  typingSpeedMs: number;
+  pauseDurationMs: number;
+  prefixText: string;
+  buildingPrefix: string;
+  headlineGradient: AccentGradientTheme;
+  roleBadgeText: string;
+  subRoleBadgeText: string;
+}
+
+export interface CustomSectionItem {
+  id: string;
+  title: string;
+  description: string;
+  icon?: string;
+  badge?: string;
+  linkUrl?: string;
+  linkLabel?: string;
+}
+
+export type CustomSectionPlacement =
+  | 'after-hero'
+  | 'after-about'
+  | 'after-projects'
+  | 'after-work'
+  | 'after-gallery'
+  | 'after-blog';
+
+export interface CustomSection {
+  id: string;
+  slug: string;
+  badge: string;
+  badgeIcon?: string;
+  title: string;
+  titleAccent: string;
+  titleSuffix?: string;
+  subtitle: string;
+  content: string; // descriptive markdown or details
+  items: CustomSectionItem[];
+  animationType: HeadingAnimationType;
+  accentGradient: AccentGradientTheme;
+  placement: CustomSectionPlacement;
+  enabled: boolean;
+  createdAt: string;
+}
+
 export interface PortfolioData {
   profile: Profile;
   skillCategories: SkillCategory[];
@@ -256,6 +334,9 @@ export interface PortfolioData {
   gallery: GalleryItem[];
   messages: ContactMessage[];
   settings: SiteSettings;
+  sectionConfigs: Record<string, SectionContentConfig>;
+  heroAnimation: HeroAnimationConfig;
+  customSections: CustomSection[];
   // CRM & ERP extensions
   leads: Lead[];
   clients: Client[];

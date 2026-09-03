@@ -29,7 +29,8 @@ import {
   ShieldCheck,
   Hexagon,
   LogOut,
-  Database
+  Database,
+  Sliders
 } from 'lucide-react';
 
 export type TaploxNavSection =
@@ -44,10 +45,12 @@ export type TaploxNavSection =
   | 'error-500'
   // CMS & Portfolio
   | 'cms-profile'
+  | 'cms-sections'
   | 'cms-projects'
   | 'cms-work'
   | 'cms-blog'
   | 'cms-gallery'
+  | 'cms-skills'
   | 'cms-messages'
   | 'crm-pipeline'
   | 'erp-operations'
@@ -288,6 +291,26 @@ export const TaploxSidebar: React.FC<TaploxSidebarProps> = ({
               </button>
 
               <button
+                onClick={() => onSelectSection('cms-sections')}
+                title={collapsed ? 'Sections & Animations' : undefined}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-colors ${
+                  currentSection === 'cms-sections'
+                    ? 'bg-[#232A42] text-[#FF7A29] font-semibold'
+                    : 'text-slate-400 hover:text-white hover:bg-[#1E2230]'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Sliders className={`w-4 h-4 ${currentSection === 'cms-sections' ? 'text-[#FF7A29]' : 'text-slate-400'}`} />
+                  {!collapsed && <span>Section Headings & FX</span>}
+                </div>
+                {!collapsed && (
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#FF7A29]/20 text-[#FF7A29] font-mono font-semibold">
+                    NEW
+                  </span>
+                )}
+              </button>
+
+              <button
                 onClick={() => onSelectSection('cms-projects')}
                 title={collapsed ? `Projects (${(data.projects || []).length})` : undefined}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-colors ${
@@ -363,6 +386,26 @@ export const TaploxSidebar: React.FC<TaploxSidebarProps> = ({
                 {!collapsed && (
                   <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#202538] text-slate-300">
                     {(data.gallery || []).length}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => onSelectSection('cms-skills')}
+                title={collapsed ? `Skills & Arsenal (${(data.skillCategories || []).length})` : undefined}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-colors ${
+                  currentSection === 'cms-skills'
+                    ? 'bg-[#232A42] text-[#3E60D5] font-semibold'
+                    : 'text-slate-400 hover:text-white hover:bg-[#1E2230]'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Sparkles className="w-4 h-4 text-[#FF7A29]" />
+                  {!collapsed && <span>Skills & Arsenal</span>}
+                </div>
+                {!collapsed && (
+                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#202538] text-slate-300">
+                    {(data.skillCategories || []).length}
                   </span>
                 )}
               </button>

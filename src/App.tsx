@@ -8,6 +8,7 @@ import { WorkTimeline } from './components/WorkTimeline';
 import { HighResGallery } from './components/HighResGallery';
 import { BlogSection } from './components/BlogSection';
 import { ContactSection } from './components/ContactSection';
+import { CustomSectionRenderer } from './components/CustomSectionRenderer';
 import { Footer } from './components/Footer';
 import { AdminPortal } from './components/admin/AdminPortal';
 import { AdminAuthScreen } from './components/admin/AdminAuthScreen';
@@ -24,11 +25,17 @@ const MainPortfolioApp: React.FC = () => {
       {/* Main Sections */}
       <main className="flex-1">
         <Hero />
+        <CustomSectionRenderer placement="after-hero" />
         <AboutSkills />
+        <CustomSectionRenderer placement="after-about" />
         <ProjectsSection />
+        <CustomSectionRenderer placement="after-projects" />
         <WorkTimeline />
+        <CustomSectionRenderer placement="after-work" />
         <HighResGallery />
+        <CustomSectionRenderer placement="after-gallery" />
         <BlogSection />
+        <CustomSectionRenderer placement="after-blog" />
         <ContactSection />
       </main>
 

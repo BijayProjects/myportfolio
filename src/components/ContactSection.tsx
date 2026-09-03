@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
+import { AnimatedHeading } from './common/AnimatedHeading';
+import { defaultSectionConfigs } from '../data/initialData';
 import {
   Mail,
   Phone,
@@ -20,6 +22,7 @@ import {
 export const ContactSection: React.FC = () => {
   const { data, submitContactForm, setIsCMSOpen, setCmsTab } = usePortfolio();
   const { profile } = data;
+  const cfg = data.sectionConfigs?.contact || defaultSectionConfigs.contact;
 
   const [formData, setFormData] = useState({
     name: '',
@@ -32,6 +35,8 @@ export const ContactSection: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedSuccessfully, setSubmittedSuccessfully] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  if (cfg.enabled === false) return null;
 
   const serviceOptions = [
     'Full-Stack Web Development',
@@ -92,14 +97,22 @@ export const ContactSection: React.FC = () => {
         <div className="text-center max-w-2xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#141A3A] border border-indigo-800/50 text-xs font-mono text-[#FF7A29] mb-3">
             <Mail className="w-3.5 h-3.5 text-[#FF7A29]" />
-            <span>Direct Communication & Inquiries</span>
+            <span>{cfg.badge || 'Direct Communication & Inquiries'}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Let's Build Something <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF7A29] to-amber-300">Exceptional</span> Together
-          </h2>
-          <p className="mt-3 text-slate-300 text-sm sm:text-base">
-            Have a project in mind, need WordPress speed tuning, or want to discuss full-time / freelance opportunities? Send a message below.
-          </p>
+          <AnimatedHeading
+            title={cfg.title || 'Initiate a Project or '}
+            accent={cfg.titleAccent || 'Hire Full-Time'}
+            suffix={cfg.titleSuffix}
+            animationType={cfg.animationType || 'glow-pulse'}
+            accentGradient={cfg.accentGradient || 'orange-amber'}
+            align="center"
+            className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight"
+          />
+          {cfg.subtitle && (
+            <p className="mt-3 text-slate-300 text-sm sm:text-base">
+              {cfg.subtitle}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">

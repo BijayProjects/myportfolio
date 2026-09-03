@@ -2,6 +2,8 @@ import React from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { BlogPost } from '../types';
 import { BlogDetailModal } from './BlogDetailModal';
+import { AnimatedHeading } from './common/AnimatedHeading';
+import { defaultSectionConfigs } from '../data/initialData';
 import {
   BookOpen,
   Calendar,
@@ -16,6 +18,9 @@ import {
 export const BlogSection: React.FC = () => {
   const { data, selectedBlog, setSelectedBlog, setIsCMSOpen, setCmsTab } = usePortfolio();
   const { blogPosts } = data;
+  const cfg = data.sectionConfigs?.blog || defaultSectionConfigs.blog;
+
+  if (cfg.enabled === false) return null;
 
   const publishedPosts = blogPosts.filter((p) => p.isPublished);
 
@@ -27,14 +32,21 @@ export const BlogSection: React.FC = () => {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#141A3A] border border-indigo-800/50 text-xs font-mono text-[#FF7A29] mb-3">
               <BookOpen className="w-3.5 h-3.5 text-[#FF7A29]" />
-              <span>Technical Insights & Engineering Notes</span>
+              <span>{cfg.badge || 'Technical Insights & Engineering Notes'}</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Latest <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF7A29] to-amber-300">Blog Posts</span> & Articles
-            </h2>
-            <p className="mt-2 text-slate-300 text-sm sm:text-base max-w-xl">
-              Practical write-ups on Python Django performance, custom WordPress development, and AI prompt engineering workflows.
-            </p>
+            <AnimatedHeading
+              title={cfg.title || 'Latest '}
+              accent={cfg.titleAccent || 'Blog Posts'}
+              suffix={cfg.titleSuffix || ' & Articles'}
+              animationType={cfg.animationType || 'typewriter'}
+              accentGradient={cfg.accentGradient || 'orange-amber'}
+              className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight"
+            />
+            {cfg.subtitle && (
+              <p className="mt-2 text-slate-300 text-sm sm:text-base max-w-xl">
+                {cfg.subtitle}
+              </p>
+            )}
           </div>
         </div>
 

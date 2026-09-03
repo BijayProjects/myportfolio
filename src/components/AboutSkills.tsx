@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
+import { AnimatedHeading } from './common/AnimatedHeading';
+import { defaultSectionConfigs } from '../data/initialData';
 import {
   Server,
   Layout,
@@ -19,7 +21,10 @@ import {
 export const AboutSkills: React.FC = () => {
   const { data, setIsCMSOpen, setCmsTab } = usePortfolio();
   const { profile, skillCategories } = data;
+  const cfg = data.sectionConfigs?.about || defaultSectionConfigs.about;
   const [activeCategory, setActiveCategory] = useState<string>('all');
+
+  if (cfg.enabled === false) return null;
 
   const getCategoryIcon = (iconName: string) => {
     switch (iconName) {
@@ -42,14 +47,22 @@ export const AboutSkills: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#141A3A] border border-indigo-800/50 text-xs font-mono text-[#FF7A29] mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-[#FF7A29]" />
-            About & Technical Arsenal
+            {cfg.badge || 'About & Technical Arsenal'}
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Engineered for <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF7A29] to-amber-300">Scalability</span> & Reliability
-          </h2>
-          <p className="mt-4 text-slate-300 text-base leading-relaxed">
-            With 2+ years of hands-on software development experience, I specialize in architecting backend systems, crafting pixel-perfect responsive frontends, and automating workflows.
-          </p>
+          <AnimatedHeading
+            title={cfg.title || 'Engineered for '}
+            accent={cfg.titleAccent || 'Scalability'}
+            suffix={cfg.titleSuffix || '& Reliability'}
+            animationType={cfg.animationType || 'glow-pulse'}
+            accentGradient={cfg.accentGradient || 'orange-amber'}
+            align="center"
+            className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight"
+          />
+          {cfg.subtitle && (
+            <p className="mt-4 text-slate-300 text-base leading-relaxed">
+              {cfg.subtitle}
+            </p>
+          )}
         </div>
 
         {/* Top Split: Professional Summary & Core Competencies */}

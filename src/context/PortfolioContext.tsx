@@ -15,9 +15,19 @@ import {
   ErpProject,
   Invoice,
   ErpTask,
-  ExpenseItem
+  ExpenseItem,
+  SkillCategory,
+  SkillItem,
+  SectionContentConfig,
+  HeroAnimationConfig,
+  CustomSection
 } from '../types';
-import { initialPortfolioData } from '../data/initialData';
+import {
+  initialPortfolioData,
+  defaultSectionConfigs,
+  defaultHeroAnimation,
+  defaultCustomSections
+} from '../data/initialData';
 
 const STORAGE_KEY = 'bijaya_portfolio_cms_data_v2';
 const AUTH_STORAGE_KEY = 'bijaya_admin_authenticated';
@@ -88,6 +98,14 @@ interface PortfolioContextType {
   updateGalleryItem: (id: string, updates: Partial<GalleryItem>) => void;
   deleteGalleryItem: (id: string) => void;
   
+  // Skills & Arsenal
+  addSkillCategory: (category: Omit<SkillCategory, 'id'>) => void;
+  updateSkillCategory: (id: string, updates: Partial<SkillCategory>) => void;
+  deleteSkillCategory: (id: string) => void;
+  addSkillToCategory: (categoryId: string, skill: SkillItem) => void;
+  updateSkillInCategory: (categoryId: string, skillIndex: number, updates: Partial<SkillItem>) => void;
+  deleteSkillFromCategory: (categoryId: string, skillIndex: number) => void;
+  
   submitContactForm: (message: Omit<ContactMessage, 'id' | 'createdAt' | 'status'>) => Promise<boolean>;
   markMessageStatus: (id: string, status: 'unread' | 'read' | 'archived') => void;
   markAllMessagesAsRead: () => void;
@@ -127,6 +145,14 @@ interface PortfolioContextType {
   addExpense: (expense: Omit<ExpenseItem, 'id'>) => void;
   deleteExpense: (id: string) => void;
   
+  // Section Content, Heading & Animation Controls
+  updateSectionConfig: (sectionId: string, updates: Partial<SectionContentConfig>) => void;
+  updateHeroAnimation: (updates: Partial<HeroAnimationConfig>) => void;
+  addCustomSection: (section: Omit<CustomSection, 'id' | 'createdAt'>) => void;
+  updateCustomSection: (id: string, updates: Partial<CustomSection>) => void;
+  deleteCustomSection: (id: string) => void;
+  reorderCustomSections: (newSections: CustomSection[]) => void;
+
   updateSettings: (settings: Partial<SiteSettings>) => void;
   resetToDefaults: () => void;
   exportDataJson: () => void;
@@ -165,7 +191,18 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           erpProjects: Array.isArray(parsed.erpProjects) ? parsed.erpProjects : initialPortfolioData.erpProjects || [],
           invoices: Array.isArray(parsed.invoices) ? parsed.invoices : initialPortfolioData.invoices || [],
           erpTasks: Array.isArray(parsed.erpTasks) ? parsed.erpTasks : initialPortfolioData.erpTasks || [],
-          expenses: Array.isArray(parsed.expenses) ? parsed.expenses : initialPortfolioData.expenses || []
+          expenses: Array.isArray(parsed.expenses) ? parsed.expenses : initialPortfolioData.expenses || [],
+          sectionConfigs: {
+            ...defaultSectionConfigs,
+            ...(parsed.sectionConfigs || {})
+          },
+          heroAnimation: {
+            ...defaultHeroAnimation,
+            ...(parsed.heroAnimation || {})
+          },
+          customSections: Array.isArray(parsed.customSections)
+            ? parsed.customSections
+            : defaultCustomSections
         };
       }
     } catch (e) {
@@ -446,6 +483,141 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setData(prev => ({
       ...prev,
       gallery: prev.gallery.filter(g => g.id !== id)
+    }));
+  };
+
+  // Skills & Technical Arsenal
+  const addSkillCategory = (newCat: Omit<SkillCategory, 'id'>) => {
+    const id = 'cat-' + Date.now();
+    setData(prev => ({
+      ...prev,
+      skillCategories: [...(prev.skillCategories || []), { id, ...newCat }]
+    }));
+  };
+
+  const updateSkillCategory = (id: string, updates: Partial<SkillCategory>) => {
+    setData(prev => ({
+      ...prev,
+      skillCategories: (prev.skillCategories || []).map(cat =>
+        cat.id === id ? { ...cat, ...updates } : cat
+      )
+    }));
+  };
+
+  const deleteSkillCategory = (id: string) => {
+    setData(prev => ({
+      ...prev,
+      skillCategories: (prev.skillCategories || []).filter(cat => cat.id !== id)
+    }));
+  };
+
+  const addSkillToCategory = (categoryId: string, skill: SkillItem) => {
+    setData(prev => ({
+      ...prev,
+      skillCategories: (prev.skillCategories || []).map(cat =>
+        cat.id === categoryId
+          ? { ...cat, skills: [...(cat.skills || []), skill] }
+          : cat
+      )
+    }));
+  };
+
+  const updateSkillInCategory = (categoryId: string, skillIndex: number, updates: Partial<SkillItem>) => {
+    setData(prev => ({
+      ...prev,
+      skillCategories: (prev.skillCategories || []).map(cat => {
+        if (cat.id !== categoryId) return cat;
+        const newSkills = [...(cat.skills || [])];
+        if (newSkills[skillIndex]) {
+          newSkills[skillIndex] = { ...newSkills[skillIndex], ...updates };
+        }
+        return { ...cat, skills: newSkills };
+      })
+    }));
+  };
+
+  const deleteSkillFromCategory = (categoryId: string, skillIndex: number) => {
+    setData(prev => ({
+      ...prev,
+      skillCategories: (prev.skillCategories || []).map(cat => {
+        if (cat.id !== categoryId) return cat;
+        return {
+          ...cat,
+          skills: (cat.skills || []).filter((_, idx) => idx !== skillIndex)
+        };
+      })
+    }));
+  };
+
+  // Section Content, Heading & Animation Controls
+  const updateSectionConfig = (sectionId: string, updates: Partial<SectionContentConfig>) => {
+    setData((prev) => {
+      const current = prev.sectionConfigs?.[sectionId] || defaultSectionConfigs[sectionId] || {
+        id: sectionId,
+        badge: 'Section',
+        title: '',
+        titleAccent: '',
+        subtitle: '',
+        animationType: 'gradient-shimmer',
+        accentGradient: 'orange-amber',
+        enabled: true
+      };
+      return {
+        ...prev,
+        sectionConfigs: {
+          ...(prev.sectionConfigs || defaultSectionConfigs),
+          [sectionId]: {
+            ...current,
+            ...updates
+          }
+        }
+      };
+    });
+  };
+
+  const updateHeroAnimation = (updates: Partial<HeroAnimationConfig>) => {
+    setData((prev) => ({
+      ...prev,
+      heroAnimation: {
+        ...(prev.heroAnimation || defaultHeroAnimation),
+        ...updates
+      }
+    }));
+  };
+
+  const addCustomSection = (section: Omit<CustomSection, 'id' | 'createdAt'>) => {
+    const id = 'sec-' + Date.now();
+    const newSection: CustomSection = {
+      ...section,
+      id,
+      createdAt: new Date().toISOString()
+    };
+    setData((prev) => ({
+      ...prev,
+      customSections: [...(prev.customSections || []), newSection]
+    }));
+  };
+
+  const updateCustomSection = (id: string, updates: Partial<CustomSection>) => {
+    setData((prev) => ({
+      ...prev,
+      customSections: (prev.customSections || []).map((sec) =>
+        sec.id === id ? { ...sec, ...updates } : sec
+      )
+    }));
+  };
+
+  const deleteCustomSection = (id: string) => {
+    setData((prev) => ({
+      ...prev,
+      customSections: (prev.customSections || []).filter((sec) => sec.id !== id)
+    }));
+  };
+
+  const reorderCustomSections = (newSections: CustomSection[]) => {
+    setData((prev) => ({
+      ...prev,
+      customSections: newSections
     }));
   };
 
@@ -801,6 +973,12 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         addGalleryItem,
         updateGalleryItem,
         deleteGalleryItem,
+        addSkillCategory,
+        updateSkillCategory,
+        deleteSkillCategory,
+        addSkillToCategory,
+        updateSkillInCategory,
+        deleteSkillFromCategory,
         submitContactForm,
         markMessageStatus,
         markAllMessagesAsRead,
@@ -830,6 +1008,12 @@ export const PortfolioProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         toggleTaskStatus,
         addExpense,
         deleteExpense,
+        updateSectionConfig,
+        updateHeroAnimation,
+        addCustomSection,
+        updateCustomSection,
+        deleteCustomSection,
+        reorderCustomSections,
         updateSettings,
         resetToDefaults,
         exportDataJson,

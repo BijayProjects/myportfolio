@@ -292,6 +292,16 @@ export const TaploxTopbar: React.FC<TaploxTopbarProps> = ({
               </button>
               <button
                 onClick={() => {
+                  onSelectSection('cms-skills');
+                  setIsSearchOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#232A42] text-slate-200 hover:text-[#3E60D5] flex items-center justify-between"
+              >
+                <span>Skills & Technical Arsenal ({data.skillCategories.length})</span>
+                <span className="text-[10px] text-slate-500">Skills</span>
+              </button>
+              <button
+                onClick={() => {
                   onSelectSection('crm-pipeline');
                   setIsSearchOpen(false);
                 }}

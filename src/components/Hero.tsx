@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
+import { defaultHeroAnimation, defaultSectionConfigs } from '../data/initialData';
 import {
   ArrowRight,
   Camera,
@@ -9,54 +10,75 @@ import {
   Linkedin,
   Phone,
   Layers,
-  Cpu
+  Cpu,
+  Sparkles
 } from 'lucide-react';
+
+const GRADIENT_MAP: Record<string, string> = {
+  'orange-amber': 'from-[#FF7A29] via-[#FF8C42] to-amber-300',
+  'indigo-blue': 'from-indigo-400 via-sky-400 to-cyan-300',
+  'emerald-teal': 'from-emerald-400 via-teal-300 to-cyan-300',
+  'rose-pink': 'from-rose-400 via-pink-400 to-amber-300',
+  'purple-violet': 'from-purple-400 via-violet-300 to-indigo-300'
+};
 
 export const Hero: React.FC = () => {
   const { data } = usePortfolio();
   const { profile } = data;
 
-  // Typing Letter Animation
-  const typingWords = [
-    'Scalable Web Systems',
-    'Django & PHP Backends',
-    'Custom CMS & Portals',
-    'AI-Powered Workflows',
-    'High-Performance UI'
-  ];
+  const heroAnim = data.heroAnimation || defaultHeroAnimation;
+  const heroSection = data.sectionConfigs?.hero || defaultSectionConfigs.hero;
+  const typingWords = heroAnim.typingWords && heroAnim.typingWords.length > 0
+    ? heroAnim.typingWords
+    : defaultHeroAnimation.typingWords;
+  const gradientClass = GRADIENT_MAP[heroAnim.headlineGradient] || GRADIENT_MAP['orange-amber'];
 
+  // Typing & Cycling Animation States
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentText, setCurrentText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const [typingSpeed, setTypingSpeed] = useState(100);
+  const [typingSpeed, setTypingSpeed] = useState(heroAnim.typingSpeedMs || 85);
 
   useEffect(() => {
+    if (heroAnim.animationType !== 'typewriter') return;
+
     const handleTyping = () => {
-      const fullWord = typingWords[currentWordIndex];
+      const fullWord = typingWords[currentWordIndex] || typingWords[0] || 'Scalable Web Systems';
 
       if (!isDeleting) {
         setCurrentText(fullWord.substring(0, currentText.length + 1));
-        setTypingSpeed(85);
+        setTypingSpeed(heroAnim.typingSpeedMs || 85);
 
         if (currentText === fullWord) {
-          // Pause at end of word
-          setTimeout(() => setIsDeleting(true), 1800);
+          setTimeout(() => setIsDeleting(true), heroAnim.pauseDurationMs || 1800);
         }
       } else {
         setCurrentText(fullWord.substring(0, currentText.length - 1));
-        setTypingSpeed(45);
+        setTypingSpeed(Math.max(35, Math.floor((heroAnim.typingSpeedMs || 85) * 0.5)));
 
         if (currentText === '') {
           setIsDeleting(false);
           setCurrentWordIndex((prev) => (prev + 1) % typingWords.length);
-          setTypingSpeed(300);
+          setTypingSpeed(280);
         }
       }
     };
 
     const timer = setTimeout(handleTyping, typingSpeed);
     return () => clearTimeout(timer);
-  }, [currentText, isDeleting, currentWordIndex, typingSpeed, typingWords]);
+  }, [currentText, isDeleting, currentWordIndex, typingSpeed, heroAnim.animationType, typingWords, heroAnim.typingSpeedMs, heroAnim.pauseDurationMs]);
+
+  // Rotate cycle for non-typewriter modes
+  const [rotateIndex, setRotateIndex] = useState(0);
+  useEffect(() => {
+    if (heroAnim.animationType === 'typewriter') return;
+    const interval = setInterval(() => {
+      setRotateIndex((prev) => (prev + 1) % typingWords.length);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, [heroAnim.animationType, typingWords.length]);
+
+  const activeRotateWord = typingWords[rotateIndex] || typingWords[0];
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -95,20 +117,99 @@ export const Hero: React.FC = () => {
           <div className="lg:col-span-7 text-center lg:text-left">
             <div className="flex items-center justify-center lg:justify-start gap-2 mb-3">
               <span className="font-mono text-xs uppercase tracking-wider text-[#FF7A29] font-bold bg-[#FF7A29]/10 px-2.5 py-1 rounded-md border border-[#FF7A29]/20">
-                Software Engineer
+                {heroAnim.roleBadgeText || 'Software Engineer'}
               </span>
-              <span className="text-slate-400 text-xs font-mono">Full-Stack Developer</span>
+              <span className="text-slate-400 text-xs font-mono">
+                {heroAnim.subRoleBadgeText || 'Full-Stack Developer'}
+              </span>
             </div>
 
-            {/* Main Headline with Typing Letter Animation */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.18] mb-5 min-h-[140px] sm:min-h-[160px] lg:min-h-[175px]">
-              Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">{profile.name}</span>.
-              <br />
-              Building{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF7A29] via-[#FF8C42] to-amber-300">
-                {currentText}
+            {/* Main Headline with Layout-Stable Animated Type Heading */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.18] mb-5">
+              <span>
+                {heroAnim.prefixText || "Hi, I'm"}{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">
+                  {profile.name}
+                </span>
+                .
               </span>
-              <span className="inline-block w-1.5 h-8 sm:h-10 lg:h-12 ml-1 bg-[#FF7A29] animate-pulse align-middle" />
+              <br />
+              <span className="inline-flex flex-wrap items-baseline justify-center lg:justify-start">
+                <span className="shrink-0">{heroAnim.buildingPrefix || 'Building'}&nbsp;</span>
+
+                {heroAnim.animationType === 'typewriter' ? (
+                  <span className="relative inline-grid text-left align-baseline max-w-full">
+                    {/* Invisible stack sizers to reserve exact dimensions across breakpoints */}
+                    {typingWords.map((word, idx) => (
+                      <span
+                        key={idx}
+                        className="col-start-1 row-start-1 invisible pointer-events-none select-none opacity-0 inline-block"
+                        aria-hidden="true"
+                      >
+                        <span>{word}</span>
+                        <span className="inline-block w-1.5 h-[0.82em] ml-1" />
+                      </span>
+                    ))}
+
+                    {/* Active animated typing text */}
+                    <span className="col-start-1 row-start-1 inline-block">
+                      <span className={`text-transparent bg-clip-text bg-gradient-to-r ${gradientClass}`}>
+                        {currentText || '\u200B'}
+                      </span>
+                      <span
+                        className="inline-block w-1.5 h-[0.82em] ml-1 bg-[#FF7A29] animate-pulse align-middle rounded-full"
+                        aria-hidden="true"
+                      />
+                    </span>
+                  </span>
+                ) : heroAnim.animationType === 'fade-rotate' ? (
+                  <span className="inline-block relative overflow-hidden align-baseline">
+                    <span
+                      key={rotateIndex}
+                      className={`inline-block text-transparent bg-clip-text bg-gradient-to-r ${gradientClass} animate-[fadeInUp_0.4s_ease-out]`}
+                    >
+                      {activeRotateWord}
+                    </span>
+                  </span>
+                ) : heroAnim.animationType === 'gradient-shimmer' ? (
+                  <span
+                    className={`inline-block text-transparent bg-clip-text bg-gradient-to-r ${gradientClass} animate-pulse font-extrabold`}
+                  >
+                    {activeRotateWord}
+                  </span>
+                ) : heroAnim.animationType === 'wave-bounce' ? (
+                  <span className="inline-flex flex-wrap gap-x-1 align-baseline">
+                    {activeRotateWord.split(' ').map((w, wIdx) => (
+                      <span key={wIdx} className="inline-flex">
+                        {w.split('').map((c, cIdx) => (
+                          <span
+                            key={cIdx}
+                            className={`inline-block text-transparent bg-clip-text bg-gradient-to-r ${gradientClass}`}
+                            style={{
+                              animation: 'waveBounce 1.8s ease-in-out infinite',
+                              animationDelay: `${(wIdx * 3 + cIdx) * 0.08}s`
+                            }}
+                          >
+                            {c}
+                          </span>
+                        ))}
+                        &nbsp;
+                      </span>
+                    ))}
+                  </span>
+                ) : (
+                  /* glitch-tech & default */
+                  <span className={`relative inline-block text-transparent bg-clip-text bg-gradient-to-r ${gradientClass} font-mono`}>
+                    <span className="relative z-10">{activeRotateWord}</span>
+                    <span
+                      className="absolute inset-0 text-cyan-400 opacity-60 blur-[1px] pointer-events-none select-none translate-x-[1px]"
+                      aria-hidden="true"
+                    >
+                      {activeRotateWord}
+                    </span>
+                  </span>
+                )}
+              </span>
             </h1>
 
             {/* Concise Clean Bio */}

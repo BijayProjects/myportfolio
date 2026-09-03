@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { Project, ProjectCategory } from '../types';
 import { ProjectDetailModal } from './ProjectDetailModal';
+import { AnimatedHeading } from './common/AnimatedHeading';
+import { defaultSectionConfigs } from '../data/initialData';
 import {
   FolderGit2,
   ExternalLink,
@@ -17,7 +19,10 @@ import {
 export const ProjectsSection: React.FC = () => {
   const { data, selectedProject, setSelectedProject, setIsCMSOpen, setCmsTab } = usePortfolio();
   const { projects } = data;
+  const cfg = data.sectionConfigs?.projects || defaultSectionConfigs.projects;
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+
+  if (cfg.enabled === false) return null;
 
   const categories: string[] = ['All', 'Full-Stack', 'WordPress', 'AI Automation', 'Backend API'];
 
@@ -37,14 +42,21 @@ export const ProjectsSection: React.FC = () => {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#141A3A] border border-indigo-800/50 text-xs font-mono text-[#FF7A29] mb-3">
               <FolderGit2 className="w-3.5 h-3.5 text-[#FF7A29]" />
-              <span>Production Portfolio</span>
+              <span>{cfg.badge || 'Production Portfolio'}</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Featured <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF7A29] to-amber-300">Software Projects</span>
-            </h2>
-            <p className="mt-2 text-slate-300 text-sm sm:text-base max-w-xl">
-              End-to-end web applications, custom WordPress architecture, AI automation engines, and high-throughput APIs.
-            </p>
+            <AnimatedHeading
+              title={cfg.title || 'Featured '}
+              accent={cfg.titleAccent || 'Software Projects'}
+              suffix={cfg.titleSuffix}
+              animationType={cfg.animationType || 'gradient-shimmer'}
+              accentGradient={cfg.accentGradient || 'orange-amber'}
+              className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight"
+            />
+            {cfg.subtitle && (
+              <p className="mt-2 text-slate-300 text-sm sm:text-base max-w-xl">
+                {cfg.subtitle}
+              </p>
+            )}
           </div>
         </div>
 

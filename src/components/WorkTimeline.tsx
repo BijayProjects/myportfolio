@@ -1,5 +1,7 @@
 import React from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
+import { AnimatedHeading } from './common/AnimatedHeading';
+import { defaultSectionConfigs } from '../data/initialData';
 import {
   Briefcase,
   Calendar,
@@ -15,6 +17,9 @@ import {
 export const WorkTimeline: React.FC = () => {
   const { data, setIsCMSOpen, setCmsTab } = usePortfolio();
   const { workEntries } = data;
+  const cfg = data.sectionConfigs?.work || defaultSectionConfigs.work;
+
+  if (cfg.enabled === false) return null;
 
   return (
     <section id="work" className="py-20 relative bg-[#070A18]/80 border-t border-indigo-950/70">
@@ -24,34 +29,47 @@ export const WorkTimeline: React.FC = () => {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#141A3A] border border-indigo-800/50 text-xs font-mono text-[#FF7A29] mb-3">
               <Briefcase className="w-3.5 h-3.5 text-[#FF7A29]" />
-              <span>Career & Work Entries</span>
+              <span>{cfg.badge || 'Career & Work Entries'}</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Work History & <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF7A29] to-amber-300">Deliverables</span>
-            </h2>
-            <p className="mt-2 text-slate-300 text-sm sm:text-base max-w-xl">
-              Chronological track record of client solutions, full-stack engagements, and software apprenticeships.
-            </p>
+            <AnimatedHeading
+              title={cfg.title || 'Work History & '}
+              accent={cfg.titleAccent || 'Deliverables'}
+              suffix={cfg.titleSuffix}
+              animationType={cfg.animationType || 'fade-rotate'}
+              accentGradient={cfg.accentGradient || 'orange-amber'}
+              className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight"
+            />
+            {cfg.subtitle && (
+              <p className="mt-2 text-slate-300 text-sm sm:text-base max-w-xl">
+                {cfg.subtitle}
+              </p>
+            )}
           </div>
         </div>
 
         {/* Timeline Container */}
-        <div className="relative pl-6 sm:pl-10 space-y-12 before:absolute before:left-2 sm:before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-gradient-to-b before:from-[#FF7A29] before:via-indigo-500 before:to-indigo-950">
+        <div className="relative space-y-12">
+          {/* Continuous Timeline Spine - mathematically aligned to node center */}
+          <div
+            aria-hidden="true"
+            className="absolute left-2.5 top-3.5 bottom-3.5 w-0.5 -translate-x-1/2 bg-gradient-to-b from-[#FF7A29] via-indigo-500 to-indigo-950 pointer-events-none"
+          />
+
           {workEntries.map((entry, index) => (
             <div
               key={entry.id}
-              className="relative group"
+              className="relative flex items-start gap-4 sm:gap-6 group"
               id={`work-entry-${entry.id}`}
             >
-              {/* Circuit Node on timeline matching brand logo */}
-              <div className="absolute -left-6 sm:-left-10 top-1 flex items-center justify-center">
+              {/* Circuit Node on timeline matching brand logo - dead-center on the vertical spine */}
+              <div className="relative flex-shrink-0 w-5 flex justify-center pt-2 z-10">
                 <div className="w-5 h-5 rounded-full bg-[#090D1A] border-2 border-[#FF7A29] flex items-center justify-center shadow-lg shadow-[#FF7A29]/30 group-hover:scale-125 transition-transform">
                   <div className="w-2 h-2 rounded-full bg-[#FF7A29]" />
                 </div>
               </div>
 
               {/* Work Card */}
-              <div className="bg-[#0C1129] border border-indigo-900/50 hover:border-indigo-700/70 rounded-2xl p-6 sm:p-7 shadow-xl transition-all">
+              <div className="flex-1 min-w-0 bg-[#0C1129] border border-indigo-900/50 hover:border-indigo-700/70 rounded-2xl p-6 sm:p-7 shadow-xl transition-all">
                 {/* Header info */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                   <div>

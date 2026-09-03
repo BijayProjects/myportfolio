@@ -8,6 +8,13 @@ import { TaploxAuthPreviews } from './TaploxAuthPreviews';
 import { CRMSection } from './CRMSection';
 import { ERPSection } from './ERPSection';
 import { AdminPasswordChangeModal } from './AdminPasswordChangeModal';
+import { ImageUploadField } from '../common/ImageUploadField';
+import { ProjectEditModal } from './crud/ProjectEditModal';
+import { BlogEditModal } from './crud/BlogEditModal';
+import { GalleryEditModal } from './crud/GalleryEditModal';
+import { WorkEditModal } from './crud/WorkEditModal';
+import { SkillsCRUDSection } from './crud/SkillsCRUDSection';
+import { SectionConfigManager } from './SectionConfigManager';
 import {
   Project,
   WorkEntry,
@@ -81,18 +88,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   // Password change modal state
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
-  // Active CMS sub-editing states
+  // Active CMS CRUD modal states
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [isCreatingProject, setIsCreatingProject] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   const [editingWork, setEditingWork] = useState<WorkEntry | null>(null);
-  const [isCreatingWork, setIsCreatingWork] = useState(false);
+  const [isWorkModalOpen, setIsWorkModalOpen] = useState(false);
 
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
-  const [isCreatingBlog, setIsCreatingBlog] = useState(false);
+  const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
 
   const [editingGallery, setEditingGallery] = useState<GalleryItem | null>(null);
-  const [isCreatingGallery, setIsCreatingGallery] = useState(false);
+  const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
 
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
   const [messageFilter, setMessageFilter] = useState<'all' | 'unread' | 'starred'>('all');
@@ -147,6 +154,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
               </div>
 
               <div className="bg-[#1D212E] border border-[#272D3D] rounded-2xl p-6 shadow-sm space-y-5">
+                {/* Avatar Image Field with Multi-Method Upload */}
+                <ImageUploadField
+                  label="Profile Avatar Image"
+                  description="Upload a personal photo via drag-and-drop, local file selection, or URL."
+                  value={data.profile.avatarImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                  onChange={(url) => updateProfile({ avatarImage: url })}
+                  aspectRatioHint="Square 1:1 recommended"
+                />
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-300 mb-1.5">Full Name</label>
@@ -263,6 +279,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
             </div>
           )}
 
+          {/* 2.5 CMS: SECTION CONTENT, HEADINGS & CUSTOM SECTIONS */}
+          {currentSection === 'cms-sections' && (
+            <SectionConfigManager />
+          )}
+
           {/* 3. CMS: PROJECTS */}
           {currentSection === 'cms-projects' && (
             <div className="space-y-6">
@@ -277,23 +298,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                 </div>
                 <button
                   onClick={() => {
-                    const newProj: Project = {
-                      id: `proj-${Date.now()}`,
-                      title: 'New Showcase Project',
-                      slug: `project-${Date.now()}`,
-                      category: 'Full-Stack',
-                      summary: 'High-performance web architecture engineered with modern technology.',
-                      fullDescription: 'Detailed overview of technical challenges, architecture choices and outcomes.',
-                      coverImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format&fit=crop&q=80',
-                      screenshots: [],
-                      techStack: ['React', 'TypeScript', 'Node.js'],
-                      features: ['High-speed rendering', 'Secure auth'],
-                      featured: true,
-                      date: '2026'
-                    };
-                    addProject(newProj);
-                    setEditingProject(newProj);
-                    showToast('Created new project!');
+                    setEditingProject(null);
+                    setIsProjectModalOpen(true);
                   }}
                   className="px-4 py-2.5 rounded-xl bg-[#3E60D5] hover:bg-[#3251bf] text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-[#3E60D5]/20"
                 >
@@ -353,7 +359,22 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                             <Star className="w-3.5 h-3.5" />
                           </button>
                           <button
-                            onClick={() => deleteProject(proj.id)}
+                            onClick={() => {
+                              setEditingProject(proj);
+                              setIsProjectModalOpen(true);
+                            }}
+                            className="p-1.5 rounded-lg border border-[#3E60D5]/40 bg-[#3E60D5]/10 text-[#60A5FA] hover:bg-[#3E60D5]/20 transition-colors cursor-pointer"
+                            title="Edit Project Details & Images"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (window.confirm(`Delete project "${proj.title}"?`)) {
+                                deleteProject(proj.id);
+                                showToast('Project deleted.');
+                              }
+                            }}
                             className="p-1.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors cursor-pointer"
                             title="Delete Project"
                           >
@@ -380,19 +401,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                 </div>
                 <button
                   onClick={() => {
-                    const newWork: WorkEntry = {
-                      id: `work-${Date.now()}`,
-                      role: 'Senior Full-Stack Engineer',
-                      organization: 'Tech Studio Labs',
-                      period: '2024 - Present',
-                      type: 'Full-time',
-                      location: 'Remote, Global',
-                      description: 'Architecting scalable cloud microservices, performant frontend web apps and client systems.',
-                      highlights: ['Led migration to high-performance React runtime', 'Mentored junior developers'],
-                      techStack: ['React', 'Node.js', 'PostgreSQL']
-                    };
-                    addWorkEntry(newWork);
-                    showToast('Added work entry!');
+                    setEditingWork(null);
+                    setIsWorkModalOpen(true);
                   }}
                   className="px-4 py-2.5 rounded-xl bg-[#3E60D5] hover:bg-[#3251bf] text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-[#3E60D5]/20"
                 >
@@ -416,13 +426,30 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                       <p className="text-xs text-slate-300 mt-2">{work.description}</p>
                     </div>
 
-                    <button
-                      onClick={() => deleteWorkEntry(work.id)}
-                      className="p-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors shrink-0"
-                      title="Delete Entry"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => {
+                          setEditingWork(work);
+                          setIsWorkModalOpen(true);
+                        }}
+                        className="p-2 rounded-xl bg-[#3E60D5]/10 border border-[#3E60D5]/30 text-[#60A5FA] hover:bg-[#3E60D5]/20 transition-colors cursor-pointer"
+                        title="Edit Work Role"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (window.confirm(`Delete entry "${work.role}"?`)) {
+                            deleteWorkEntry(work.id);
+                            showToast('Work entry deleted.');
+                          }
+                        }}
+                        className="p-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors cursor-pointer"
+                        title="Delete Entry"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -441,22 +468,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                 </div>
                 <button
                   onClick={() => {
-                    const newBlog: BlogPost = {
-                      id: `blog-${Date.now()}`,
-                      title: 'Architecting Scalable React & Node Solutions in 2026',
-                      slug: `article-${Date.now()}`,
-                      excerpt: 'A comprehensive guide to state architecture, edge rendering, and database synchronization.',
-                      content: '# Overview\nBuilding modern web applications requires precision...',
-                      coverImage: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80',
-                      tags: ['React', 'Architecture', 'TypeScript'],
-                      publishedAt: 'September 2026',
-                      readTime: '6 min read',
-                      author: 'Bijaya Tamang',
-                      isPublished: true,
-                      views: 120
-                    };
-                    addBlogPost(newBlog);
-                    showToast('Created blog article!');
+                    setEditingBlog(null);
+                    setIsBlogModalOpen(true);
                   }}
                   className="px-4 py-2.5 rounded-xl bg-[#3E60D5] hover:bg-[#3251bf] text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-[#3E60D5]/20"
                 >
@@ -484,12 +497,30 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                       <span className="text-[10px] text-slate-500 font-mono">
                         {post.views || 0} views • by {post.author}
                       </span>
-                      <button
-                        onClick={() => deleteBlogPost(post.id)}
-                        className="p-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingBlog(post);
+                            setIsBlogModalOpen(true);
+                          }}
+                          className="p-1.5 rounded-lg bg-[#3E60D5]/10 border border-[#3E60D5]/30 text-[#60A5FA] hover:bg-[#3E60D5]/20 transition-colors cursor-pointer"
+                          title="Edit Article"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`Delete article "${post.title}"?`)) {
+                              deleteBlogPost(post.id);
+                              showToast('Article deleted.');
+                            }
+                          }}
+                          className="p-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 transition-colors cursor-pointer"
+                          title="Delete Article"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -509,20 +540,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                 </div>
                 <button
                   onClick={() => {
-                    const newItem: GalleryItem = {
-                      id: `gal-${Date.now()}`,
-                      title: 'Modern Architecture Prototype',
-                      category: 'UI/UX Mockups',
-                      imageUrl: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=80',
-                      highResUrl: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=1600&auto=format&fit=crop&q=90',
-                      resolution: '3840x2160',
-                      aspectRatio: '16:9',
-                      description: 'Clean high-contrast responsive interface prototype design.',
-                      date: '2026',
-                      tags: ['UI', 'Prototype']
-                    };
-                    addGalleryItem(newItem);
-                    showToast('Added gallery asset!');
+                    setEditingGallery(null);
+                    setIsGalleryModalOpen(true);
                   }}
                   className="px-4 py-2.5 rounded-xl bg-[#3E60D5] hover:bg-[#3251bf] text-white text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md shadow-[#3E60D5]/20"
                 >
@@ -535,25 +554,54 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                 {(data.gallery || []).map((item) => (
                   <div
                     key={item.id}
-                    className="bg-[#1D212E] border border-[#272D3D] rounded-2xl overflow-hidden shadow-sm"
+                    className="bg-[#1D212E] border border-[#272D3D] rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between"
                   >
-                    <div className="h-44 bg-[#161922] relative">
-                      <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
-                      <button
-                        onClick={() => deleteGalleryItem(item.id)}
-                        className="absolute top-2.5 right-2.5 p-1.5 rounded-lg bg-black/70 backdrop-blur-md text-red-400 hover:bg-black/90 border border-white/10"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <div className="p-3.5">
-                      <h4 className="font-bold text-white text-xs">{item.title}</h4>
-                      <p className="text-[11px] text-slate-400 mt-0.5">{item.description}</p>
+                    <div>
+                      <div className="h-44 bg-[#161922] relative group">
+                        <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1">
+                          <button
+                            onClick={() => {
+                              setEditingGallery(item);
+                              setIsGalleryModalOpen(true);
+                            }}
+                            className="p-1.5 rounded-lg bg-black/70 backdrop-blur-md text-[#60A5FA] hover:bg-black/90 border border-white/10"
+                            title="Edit Gallery Asset"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (window.confirm(`Delete asset "${item.title}"?`)) {
+                                deleteGalleryItem(item.id);
+                                showToast('Gallery asset deleted.');
+                              }
+                            }}
+                            className="p-1.5 rounded-lg bg-black/70 backdrop-blur-md text-red-400 hover:bg-black/90 border border-white/10"
+                            title="Delete Asset"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="p-3.5">
+                        <div className="flex items-center justify-between text-[10px] text-[#60A5FA] font-mono mb-1">
+                          <span>{item.category}</span>
+                          <span>{item.resolution}</span>
+                        </div>
+                        <h4 className="font-bold text-white text-xs">{item.title}</h4>
+                        <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2">{item.description}</p>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+          )}
+
+          {/* CMS: SKILLS & TECHNICAL ARSENAL */}
+          {currentSection === 'cms-skills' && (
+            <SkillsCRUDSection onShowToast={showToast} />
           )}
 
           {/* 7. CMS: INQUIRIES & MESSAGES */}
@@ -716,7 +764,80 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
         <AdminPasswordChangeModal onClose={() => setIsPasswordModalOpen(false)} />
       )}
 
-      {/* Toast Notification Notification Pill */}
+      {/* CRUD Edit Modals */}
+      <ProjectEditModal
+        project={editingProject}
+        isOpen={isProjectModalOpen}
+        onClose={() => {
+          setIsProjectModalOpen(false);
+          setEditingProject(null);
+        }}
+        onSave={(dataToSave) => {
+          if (editingProject) {
+            updateProject(editingProject.id, dataToSave);
+            showToast(`Updated project "${dataToSave.title}"!`);
+          } else {
+            addProject(dataToSave as any);
+            showToast(`Published new project "${dataToSave.title}"!`);
+          }
+        }}
+      />
+
+      <BlogEditModal
+        post={editingBlog}
+        isOpen={isBlogModalOpen}
+        onClose={() => {
+          setIsBlogModalOpen(false);
+          setEditingBlog(null);
+        }}
+        onSave={(dataToSave) => {
+          if (editingBlog) {
+            updateBlogPost(editingBlog.id, dataToSave);
+            showToast(`Updated article "${dataToSave.title}"!`);
+          } else {
+            addBlogPost(dataToSave as any);
+            showToast(`Published new article "${dataToSave.title}"!`);
+          }
+        }}
+      />
+
+      <GalleryEditModal
+        item={editingGallery}
+        isOpen={isGalleryModalOpen}
+        onClose={() => {
+          setIsGalleryModalOpen(false);
+          setEditingGallery(null);
+        }}
+        onSave={(dataToSave) => {
+          if (editingGallery) {
+            updateGalleryItem(editingGallery.id, dataToSave);
+            showToast(`Updated gallery asset "${dataToSave.title}"!`);
+          } else {
+            addGalleryItem(dataToSave);
+            showToast(`Added new asset "${dataToSave.title}"!`);
+          }
+        }}
+      />
+
+      <WorkEditModal
+        entry={editingWork}
+        isOpen={isWorkModalOpen}
+        onClose={() => {
+          setIsWorkModalOpen(false);
+          setEditingWork(null);
+        }}
+        onSave={(dataToSave) => {
+          if (editingWork) {
+            updateWorkEntry(editingWork.id, dataToSave);
+            showToast(`Updated role "${dataToSave.role}"!`);
+          } else {
+            addWorkEntry(dataToSave as any);
+            showToast(`Added new role "${dataToSave.role}"!`);
+          }
+        }}
+      />
+
+      {/* Toast Notification Pill */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-2xl bg-[#1D212E] border border-[#3E60D5] text-white text-xs font-semibold shadow-2xl flex items-center gap-2 animate-bounce">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { usePortfolio } from '../../context/PortfolioContext';
+import { ImageUploadField } from '../common/ImageUploadField';
 import {
   Project,
   WorkEntry,
@@ -706,12 +707,12 @@ const ProjectForm: React.FC<{
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-xs font-mono text-slate-300 mb-1">Cover Image URL</label>
-          <input
-            type="url"
+          <ImageUploadField
+            label="Cover Image"
+            description="Update via URL, drag-and-drop, or local device file browser."
             value={form.coverImage}
-            onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
-            className="w-full px-3 py-2 rounded-xl bg-[#080C1E] border border-indigo-950 text-white text-xs outline-none focus:border-[#FF7A29]"
+            onChange={(url) => setForm({ ...form, coverImage: url })}
+            required
           />
         </div>
 
@@ -1138,12 +1139,12 @@ const BlogForm: React.FC<{
         </div>
 
         <div>
-          <label className="block text-xs font-mono text-slate-300 mb-1">Cover Image URL</label>
-          <input
-            type="url"
+          <ImageUploadField
+            label="Cover Image"
+            description="Update via URL, drag-and-drop, or local file browse."
             value={form.coverImage}
-            onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
-            className="w-full px-3 py-2 rounded-xl bg-[#080C1E] border border-indigo-950 text-white text-xs outline-none"
+            onChange={(url) => setForm({ ...form, coverImage: url })}
+            required
           />
         </div>
 
@@ -1345,24 +1346,26 @@ const GalleryForm: React.FC<{
           </select>
         </div>
 
-        <div className="sm:col-span-2">
-          <label className="block text-xs font-mono text-slate-300 mb-1">Preview Image URL *</label>
-          <input
-            type="url"
-            required
+        <div className="sm:col-span-2 space-y-3">
+          <ImageUploadField
+            label="Preview Image Asset *"
+            description="Update via URL, drag-and-drop, or local device file browser."
             value={form.imageUrl}
-            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-            className="w-full px-3 py-2 rounded-xl bg-[#080C1E] border border-indigo-950 text-white text-xs outline-none"
+            onChange={(url) =>
+              setForm({
+                ...form,
+                imageUrl: url,
+                highResUrl: form.highResUrl || url
+              })
+            }
+            required
           />
-        </div>
 
-        <div className="sm:col-span-2">
-          <label className="block text-xs font-mono text-slate-300 mb-1">Full 4K / High-Res URL (optional)</label>
-          <input
-            type="url"
+          <ImageUploadField
+            label="Full 4K / High-Res Image (Optional)"
+            description="Optional high-resolution asset URL, drag-and-drop or file upload."
             value={form.highResUrl}
-            onChange={(e) => setForm({ ...form, highResUrl: e.target.value })}
-            className="w-full px-3 py-2 rounded-xl bg-[#080C1E] border border-indigo-950 text-white text-xs outline-none"
+            onChange={(url) => setForm({ ...form, highResUrl: url })}
           />
         </div>
 

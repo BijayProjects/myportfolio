@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { usePortfolio } from '../context/PortfolioContext';
 import { GalleryItem, GalleryCategory } from '../types';
 import { GalleryLightbox } from './GalleryLightbox';
+import { AnimatedHeading } from './common/AnimatedHeading';
+import { defaultSectionConfigs } from '../data/initialData';
 import {
   Camera,
   Maximize2,
@@ -16,7 +18,10 @@ import {
 export const HighResGallery: React.FC = () => {
   const { data, selectedGalleryItem, setSelectedGalleryItem, setIsCMSOpen, setCmsTab } = usePortfolio();
   const { gallery } = data;
+  const cfg = data.sectionConfigs?.gallery || defaultSectionConfigs.gallery;
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+
+  if (cfg.enabled === false) return null;
 
   const categories: string[] = ['All', 'Web Apps', 'WordPress', 'AI Systems', 'UI/UX Mockups', 'Architecture'];
 
@@ -35,14 +40,21 @@ export const HighResGallery: React.FC = () => {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#141A3A] border border-indigo-800/50 text-xs font-mono text-[#FF7A29] mb-3">
               <Camera className="w-3.5 h-3.5 text-[#FF7A29]" />
-              <span>High-Resolution Showcase</span>
+              <span>{cfg.badge || 'High-Resolution Showcase'}</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Visual <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF7A29] to-amber-300">Design & Architecture</span> Gallery
-            </h2>
-            <p className="mt-2 text-slate-300 text-sm sm:text-base max-w-xl">
-              High-resolution captures of responsive web applications, backend schema diagrams, WordPress UI designs, and AI node workflows.
-            </p>
+            <AnimatedHeading
+              title={cfg.title || 'Visual '}
+              accent={cfg.titleAccent || 'Design & Architecture'}
+              suffix={cfg.titleSuffix || ' Gallery'}
+              animationType={cfg.animationType || 'gradient-shimmer'}
+              accentGradient={cfg.accentGradient || 'orange-amber'}
+              className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight"
+            />
+            {cfg.subtitle && (
+              <p className="mt-2 text-slate-300 text-sm sm:text-base max-w-xl">
+                {cfg.subtitle}
+              </p>
+            )}
           </div>
         </div>
 
